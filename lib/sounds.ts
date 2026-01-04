@@ -71,7 +71,7 @@ async function playBeep(
  * Play a long beep to signify active stage has started (rest -> work)
  */
 export function playActiveStartBeep(): void {
-  playBeep(750, 2600, 1.0); // Long, loud beep
+  playBeep(750, 2600, 2.0); // Long, loud beep
 }
 
 /**
@@ -81,7 +81,7 @@ export function playRestStartBeeps(): void {
   const beepDuration = 100;
   const beepGap = 80;
   const frequency = 600;
-  const volume = 1.0;
+  const volume = 2.0;
 
   playBeep(frequency, beepDuration, volume);
   setTimeout(
