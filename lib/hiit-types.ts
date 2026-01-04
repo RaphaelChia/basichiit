@@ -6,7 +6,7 @@ export interface HIITConfig {
   cooldown: number; // seconds (optional)
 }
 
-export type TimerPhase = 'prep' | 'work' | 'rest' | 'cooldown' | 'complete';
+export type TimerPhase = "prep" | "work" | "rest" | "cooldown" | "complete";
 
 export interface TimerState {
   phase: TimerPhase;
@@ -22,4 +22,3 @@ export interface PhaseInfo {
   nextLabel?: string;
   color: string;
 }
-
