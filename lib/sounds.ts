@@ -5,11 +5,29 @@
 // Create audio context (singleton pattern)
 let audioContext: AudioContext | null = null
 
-function getAudioContext(): AudioContext {
+async function getAudioContext(): Promise<AudioContext> {
   if (!audioContext) {
     audioContext = new (window.AudioContext || (window as any).webkitAudioContext)()
   }
+  
+  // Resume audio context if it's suspended (required for autoplay policies)
+  if (audioContext.state === 'suspended') {
+    try {
+      await audioContext.resume()
+    } catch (error) {
+      console.warn('Failed to resume audio context:', error)
+    }
+  }
+  
   return audioContext
+}
+
+/**
+ * Initialize audio context (should be called on user interaction)
+ * This ensures audio works in browsers with strict autoplay policies
+ */
+export async function initializeAudio(): Promise<void> {
+  await getAudioContext()
 }
 
 /**
@@ -18,9 +36,9 @@ function getAudioContext(): AudioContext {
  * @param duration - Duration in milliseconds (default: 200)
  * @param volume - Volume from 0 to 1 (default: 0.5)
  */
-function playBeep(frequency: number = 800, duration: number = 200, volume: number = 0.5): void {
+async function playBeep(frequency: number = 800, duration: number = 200, volume: number = 0.5): Promise<void> {
   try {
-    const ctx = getAudioContext()
+    const ctx = await getAudioContext()
     const oscillator = ctx.createOscillator()
     const gainNode = ctx.createGain()
 
@@ -66,9 +84,9 @@ export function playRestStartBeeps(): void {
  * Play a congratulations sound when workout completes
  * Creates a pleasant ascending melody
  */
-export function playCongratulationsSound(): void {
+export async function playCongratulationsSound(): Promise<void> {
   try {
-    const ctx = getAudioContext()
+    const ctx = await getAudioContext()
     const notes = [
       { freq: 523.25, duration: 150 }, // C5
       { freq: 659.25, duration: 150 }, // E5

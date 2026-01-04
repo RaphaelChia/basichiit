@@ -18,6 +18,7 @@ import {
   playActiveStartBeep,
   playRestStartBeeps,
   playCongratulationsSound,
+  initializeAudio,
 } from "@/lib/sounds";
 
 // TypeScript types for Wake Lock API
@@ -352,12 +353,15 @@ export function HIITTimer() {
     };
   }, [timerState?.isPaused, timerState?.phase, requestWakeLock]);
 
-  const handleStart = () => {
+  const handleStart = async () => {
     const validationError = validateConfig(config);
     if (validationError) {
       setError(validationError);
       return;
     }
+
+    // Initialize audio context on user interaction (required for autoplay policies)
+    await initializeAudio();
 
     setError(null);
     const fullConfig: HIITConfig = {
@@ -374,7 +378,9 @@ export function HIITTimer() {
     setTimerState((prev) => (prev ? { ...prev, isPaused: true } : null));
   };
 
-  const handlePlay = () => {
+  const handlePlay = async () => {
+    // Ensure audio context is initialized/resumed when resuming playback
+    await initializeAudio();
     setTimerState((prev) => (prev ? { ...prev, isPaused: false } : null));
   };
 
