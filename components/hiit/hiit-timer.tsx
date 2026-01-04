@@ -56,7 +56,7 @@ function getPhaseInfo(
     case "prep":
       return {
         label: "Prep",
-        nextLabel: `Work (${formatTime(config.work)}s)`,
+        nextLabel: `Work (${formatTime(config.work)})`,
         color: "oklch(0.70 0.15 162)", // primary
       };
     case "work":
@@ -64,7 +64,7 @@ function getPhaseInfo(
         label: "Work",
         nextLabel:
           currentSet < totalSets
-            ? `Rest (${formatTime(config.rest)}s)`
+            ? `Rest (${formatTime(config.rest)})`
             : config.cooldown > 0
             ? `Cooldown (${formatTime(config.cooldown)}s)`
             : undefined,
@@ -73,7 +73,7 @@ function getPhaseInfo(
     case "rest":
       return {
         label: "Rest",
-        nextLabel: `Work (${formatTime(config.work)}s)`,
+        nextLabel: `Work (${formatTime(config.work)})`,
         color: "oklch(0.85 0.13 165)", // chart-1/green for rest
       };
     case "cooldown":
