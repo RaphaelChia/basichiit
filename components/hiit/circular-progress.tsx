@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { cn } from "@/lib/utils"
+import * as React from "react";
+import { cn } from "@/lib/utils";
 
 interface CircularProgressProps {
   progress: number; // 0-100
@@ -20,12 +20,15 @@ export function CircularProgress({
   className,
   children,
 }: CircularProgressProps) {
-  const radius = (size - strokeWidth) / 2
-  const circumference = 2 * Math.PI * radius
-  const offset = circumference - (progress / 100) * circumference
+  const radius = (size - strokeWidth) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const offset = circumference - (progress / 100) * circumference;
 
   return (
-    <div className={cn("relative flex items-center justify-center", className)} style={{ width: size, height: size }}>
+    <div
+      className={cn("relative flex items-center justify-center", className)}
+      style={{ width: size, height: size }}
+    >
       <svg
         width={size}
         height={size}
@@ -63,6 +66,5 @@ export function CircularProgress({
         {children}
       </div>
     </div>
-  )
+  );
 }
-

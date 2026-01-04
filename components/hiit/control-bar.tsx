@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Button } from "@/components/ui/button"
-import { Play, Pause, RotateCcw, SkipForward } from "lucide-react"
-import { cn } from "@/lib/utils"
+import * as React from "react";
+import { Button } from "@/components/ui/button";
+import { Play, Pause, RotateCcw, SkipForward } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface ControlBarProps {
   isPaused: boolean;
@@ -56,6 +56,5 @@ export function ControlBar({
         <SkipForward className="h-5 w-5" />
       </Button>
     </div>
-  )
+  );
 }
-

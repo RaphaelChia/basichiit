@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { cn } from "@/lib/utils"
+import * as React from "react";
+import { cn } from "@/lib/utils";
 
 interface NextUpLabelProps {
   label: string;
@@ -19,7 +19,7 @@ export function NextUpLabel({
     "top-left": "top-4 left-4",
     "bottom-right": "bottom-4 right-4",
     "bottom-left": "bottom-4 left-4",
-  }
+  };
 
   return (
     <div
@@ -31,6 +31,5 @@ export function NextUpLabel({
     >
       Next: {label}
     </div>
-  )
+  );
 }
-
