@@ -10,6 +10,19 @@ import { ControlBar } from "./control-bar"
 import { HIITConfig, TimerPhase, TimerState, PhaseInfo } from "@/lib/hiit-types"
 import { cn } from "@/lib/utils"
 
+// TypeScript types for Wake Lock API
+interface WakeLockSentinel extends EventTarget {
+  released: boolean
+  type: 'screen'
+  release(): Promise<void>
+}
+
+interface Navigator {
+  wakeLock?: {
+    request(type: 'screen'): Promise<WakeLockSentinel>
+  }
+}
+
 const MIN_TIME = 1 // 1 second
 const MAX_TIME = 3600 // 60 minutes in seconds
 
@@ -142,15 +155,46 @@ export function HIITTimer() {
   const [error, setError] = React.useState<string | null>(null)
   const [timerState, setTimerState] = React.useState<TimerState | null>(null)
   const intervalRef = React.useRef<ReturnType<typeof setInterval> | null>(null)
+  const wakeLockRef = React.useRef<WakeLockSentinel | null>(null)
 
-  // Cleanup interval on unmount
+  // Wake Lock functions
+  const requestWakeLock = React.useCallback(async () => {
+    if ('wakeLock' in navigator) {
+      try {
+        const wakeLock = await navigator.wakeLock.request('screen')
+        wakeLockRef.current = wakeLock
+
+        // Handle when wake lock is released (e.g., user switches tabs)
+        wakeLock.addEventListener('release', () => {
+          wakeLockRef.current = null
+        })
+      } catch (err) {
+        // Wake lock request failed (e.g., user denied permission, browser doesn't support it)
+        console.warn('Wake lock request failed:', err)
+      }
+    }
+  }, [])
+
+  const releaseWakeLock = React.useCallback(async () => {
+    if (wakeLockRef.current) {
+      try {
+        await wakeLockRef.current.release()
+        wakeLockRef.current = null
+      } catch (err) {
+        console.warn('Wake lock release failed:', err)
+      }
+    }
+  }, [])
+
+  // Cleanup interval and wake lock on unmount
   React.useEffect(() => {
     return () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current)
       }
+      releaseWakeLock()
     }
-  }, [])
+  }, [releaseWakeLock])
 
   // Timer interval logic
   React.useEffect(() => {
@@ -208,6 +252,39 @@ export function HIITTimer() {
       }
     }
   }, [timerState?.isPaused, timerState?.phase])
+
+  // Manage wake lock based on timer state
+  React.useEffect(() => {
+    if (timerState && !timerState.isPaused && timerState.phase !== 'complete') {
+      // Request wake lock when timer is running
+      requestWakeLock()
+    } else {
+      // Release wake lock when paused or complete
+      releaseWakeLock()
+    }
+  }, [timerState?.isPaused, timerState?.phase, requestWakeLock, releaseWakeLock])
+
+  // Handle visibility change (when user switches tabs/apps)
+  React.useEffect(() => {
+    const handleVisibilityChange = async () => {
+      if (
+        document.visibilityState === 'visible' &&
+        timerState &&
+        !timerState.isPaused &&
+        timerState.phase !== 'complete'
+      ) {
+        // Re-request wake lock if it was released
+        if (!wakeLockRef.current) {
+          await requestWakeLock()
+        }
+      }
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+    }
+  }, [timerState?.isPaused, timerState?.phase, requestWakeLock])
 
   const handleStart = () => {
     const validationError = validateConfig(config)
