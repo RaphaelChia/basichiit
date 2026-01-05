@@ -80,7 +80,7 @@ export function playActiveStartBeep(): void {
 export function playRestStartBeeps(): void {
   const beepDuration = 100;
   const beepGap = 80;
-  const frequency = 600;
+  const frequency = 1000;
   const volume = 2.0;
 
   playBeep(frequency, beepDuration, volume);
